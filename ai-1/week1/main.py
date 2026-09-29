@@ -76,8 +76,8 @@ import pandas as pd
 import numpy as np
 import statistics as st
 
-gercek = [12, 123, 34, 56, 7, 88, 9]
-tahmin = [11, 110, 25, 58, 9, 92, 11]
+gercek = [12, 123, 34, 56, 7, 88, 9] # Veri seti
+tahmin = [11, 110, 25, 58, 9, 92, 11] # Tahmin edilen değerler (modelin çıktısı)
 
 # 1 MAE hesaplama
 mae = mean_absolute_error(gercek, tahmin)

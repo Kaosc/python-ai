@@ -1,0 +1,5 @@
+{
+  "terminal.integrated.cwd": "E:\\dev\\python-ai\\ai-1",  
+  "python.terminal.executeInFileDir": true,
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
+}

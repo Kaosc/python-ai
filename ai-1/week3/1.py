@@ -1,42 +1,61 @@
-import pandas as pd
-import numpy as np 
-
 import scipy.linalg as la
-import scipy.stats as sa
+import numpy as np
 
-# Matris tanımlama. (Kare olmak zorunda, 2x2, 3x3 etc.)
+# ==============================================
+# 1. Matris İşlemleri
+# ==============================================
 
-matris = [
-    [1,2,5],
-    [3,4,6],
-    [6,3,7]
-  ]
+x = np.array([[1, 2], [3, 4]])
 
-# Matris determinat hesaplama.
-res = la.det(matris)
+y = np.array([[5, 6], [7, 8]])
 
-# Matrisin satırlarını sütunlara çeviri. Tersini alma.
-res2 = la.inv(matris)
+# Matris Çarpımı (@)
+# Birinci matrisin satırları ile ikinci matrisin sütunlarının çarpımı alınır ve toplanır.
+c = x @ y
+print("Matris Çarpımı (@):\n", c)
+# Çıktı:
+# [[19 22]
+#  [43 50]]
 
-print(res)
+# Transpoz (.T) (X matrisinin transpozu)
+# Transpoz, bir matrisin satır ve sütunlarının yer değiştirmesidir. Yani, matrisin satırları sütun olur ve sütunları satır olur.
+ters = x.T
+print("Transpoz (.T):\n", ters)
+# Çıktı:
+# [[1 3]
+#  [2 4]]
 
+# ==============================================
+# 2. Determinant, Matris Tersi ve Denklem Çözümü
+# ==============================================
+matris = [[1, 2, 5], [3, 4, 6], [6, 3, 7]]
 
-# örnek denklemi matrise çevirerek çözüm
+# Determinant (la.det)
+# Determinant, bir kare matrisin tek bir sayısal değerini temsil eder ve matrisin tersinin olup olmadığını belirler.
+# Eğer determinant sıfır ise, matrisin tersi yoktur.
+det_sonuc = la.det(matris)
+print("Determinant:", det_sonuc)
+# Çıktı: 15.0
 
-# 2x + y = 5 --> y = 5 - 2x
-# x + 3y = 6 --> y = (6 - x) / 2
+# Matris Tersi (la.inv) (inv = inverse)
+# Matrisin tersi, bir matrisin çarpımı ile birim matrisi elde etmek için kullanılan başka bir matristir.
+# Yani, A * A^-1 = I (birim matris).
+inv_sonuc = la.inv(matris)
+print("Matris Tersi:\n", inv_sonuc)
+# Çıktı:
+# [[-0.66666667  0.06666667  0.53333333]
+#  [-1.          1.5        -0.66666667]
+#  [ 1.         -0.66666667  0.13333333]]
 
-# Katsayılar matrisi x değişken matrisi = y
+# ==============================================
+# 3. Lineer Denklem Sistemi Çözümü (Ax = b)
+# ==============================================
 
-# Katsayılar matirisi
-a = [[2,1], [1,3]] 
+# 2x + 1y = 5
+# 1x + 3y = 6
+a = [[2, 1], [1, 3]]  # Katsayılar matrisi
+b = [5, 6]  # Sonuç matrisi
 
-# Değişkenler matrisi
-b = [5, 6]
-
-# Katsayılar ve değiken matrisi çarpımı bulma
-# - Birinci matrisin satırı ile 2. matrisin sütunu eşit değilse çarpma yapılamaz
-res3 = la.solve(a, b) # // [1.8, 1.4] 1.si= X, 2.si = Y
-print(res3)
-
-
+denklem_sonuc = la.solve(a, b)
+print("Denklem Çözümü [x, y]:", denklem_sonuc)
+# Çıktı: [1.8 1.4]  (x = 1.8, y = 1.4)

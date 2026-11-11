@@ -1,42 +1,53 @@
-import pandas as pd
-import numpy as np 
-
-import scipy.linalg as la
-import scipy.stats as sa
-
-from scipy.signal import find_peaks
-from scipy.integrate import quad # intergral
-import matplotlib.pyplot as plt 
+import numpy as np
 from scipy.interpolate import interp1d
 
-# Denklem optimizasyonu ile denklem minumum değeri bulma.
+# ======================================================================
+# Aralık İçi ve Aralık Dışı Tahmin (İnterpolasyon ve Doğrusal Tahmin)
+# ======================================================================
 
-x = [1,2,4]
+# Verilen veri seti üzerinden, veride olmayan bir x değeri için y karşılığını tahmin etmek için kullanılır.
+
+x = [1, 2, 4]
 y = [10, 17, 21]
 
-# Tahmin (Bir aralık içi tahmin)
+# ====================================
+# 1. Aralık İçi Tahmin (Interpolation)
+# ====================================
+
 f = interp1d(x, y)
+sonuc_ici = f(4)  # x=4 için y karşılığını getirir
+print("Aralık İçi Tahmin (x=4):", sonuc_ici)
+# Çıktı: 21.0
+# x veri setinde aynı indeksli bir değer olduğu için direkt olarak y karşılığı döndürülür.
 
-# sonuc = f(1) --> 10
-# sonuc = f(2) --> 17
-sonuc = f(4) # --> 21.0
+# ==================================================
+# 2. Aralık Dışı Tahmin (Lineer Regresyon / Polyfit)
+# ==================================================
 
-print(sonuc) # 21.0
+n, b = np.polyfit(x, y, 1)  # 1. derece denklem (y = n*x + b) katsayılarını çıkarır
+print(f"Eğim (n): {n}")
+print(f"Kesim Noktası (b): {b}")
+# Çıktı:
+# Eğim (n): 3.571428571428571,
+# Kesim Noktası (b): 7.285714285714287
 
-# Aralık dışı tahmin işlemi
+# Veri setinde olmayan x = 5 için tahmin yürütme
+tahmin_x = 5
+sonuc_disi = n * tahmin_x + b
+print("Aralık Dışı Tahmin (x=5):", sonuc_disi)
+# Çıktı: 25.14285714285714
 
-# Doğrusallık oluşturarak olmayan bir x verisini tahmin etme 
-# örneğin 5 verisi x de yok dolayısı ile karşılığı yok.
-# 3. parametre denklem parametresi (1. derece, 2. derece)
-# n = x'in katsayısı, b = hata payı
-# 1. derece bir denklem dönderir.
-# doğrusal regresyon
+# ==================================================
+# Örnek Aralık Dışı Tahmin (x=6)
+# ==================================================
 
-n, b = np.polyfit(x, y, 1)
+l1 = [2, 6, 18]  # 3'ün katı şeklinde bir veri seti
+l2 = [1, 3, 9]  # 3'ün karesi şeklinde bir veri seti
 
-# tahmin etmek istediğimiz değer
-tahmin = 5
+tahmin_x2 = 54 # (18 * 3)
 
-sonuc2 = n * tahmin + b
-
-print(sonuc2) # 25.14285714285714
+# 3'ün katı şeklinde bir veri seti için tahmin
+n1, b1 = np.polyfit(l1, l2, 1)
+sonuc_disi2 = n1 * tahmin_x2 + b1
+print("Aralık Dışı Tahmin (x=54):", sonuc_disi2)
+# Çıktı: 27.0

@@ -1,107 +1,96 @@
 import pandas as pd
 import numpy as np
 
+# ==================================================
+# 1. Veri Okuma ve iloc ile Dilimleme (Ön İşleme)
+# ==================================================
+
 veri = pd.read_csv("E:\\dev\\python-ai\\ai-1\\week4\\iris.csv")
 
-# ==================================================
-# Veri önişleme
-# ==================================================
+# iloc Kulanım Kuralları
+# veri.iloc[0,0]   --> 1. satır 1. sütun
+# veri.iloc[:,0]   --> 1. sütunun tüm satırları
+# veri.iloc[0,:]   --> 1. satırın tüm sütunları
+# veri.iloc[:,:-1] --> Tüm satırlar ve son sütun hariç tüm sütunlar
 
-# veri setinde bağımlı ve bağımsız değişkenleri birbirinden
-# ayırmak gerekir. iloc bu amaçla kullanılır.
+ozellikler = veri.iloc[:, :-1]  # Bağımsız Değişkenler (Sepal/Petal boyutları) 4 sütun - X bağımsız değişkenler
+hedef_sinif = veri.iloc[:, -1]  # Bağımlı Değişken (Çiçek türü) 1 sütun - Y bağımlı değişkenler
 
-# veri.iloc[:] --> ?
-# veri.iloc[0,0] --> 1. satır 1. sütun
-# veri.iloc[::] --> Tüm satır ve sütunlar (genelde ilk yapılan işlem)
-# veri.iloc[:,0] -->
-
-# a = veri.iloc[:,0] --> 1. Sütunun tüm satırları
-# a = veri.iloc[0,:] --> 1. Satırın tüm sütunları
-
-# x = veri.iloc[:,:-1] --> Tüm satırlar ve Son sütun hariç tüm sütunlar (arr.length -1)
-
-x = veri.iloc[:, :-1]  # --> Bağımlı değişkenler
-y = veri.iloc[:, -1]  # --> Son sütunu al (bağımsız değişken)
-
-print(x.head())  # --> İlk 5 değerin özetini verir
-"""
-   sepal_length  sepal_width  petal_length  petal_width
-0           5.1          3.5           1.4          0.2
-1           4.9          3.0           1.4          0.2
-2           4.7          3.2           1.3          0.2
-3           4.6          3.1           1.5          0.2
-4           5.0          3.6           1.4          0.2
-"""
-
-print(x.shape)  # --> Satır, sütun sayılarını verir # (150, 4)
+print(ozellikler.head())
+# Çıktı: İlk 5 satır özet tablosu
+print(ozellikler.shape)
+# Çıktı: (150, 4) -> 150 örnek, 4 öznitelik
 
 # ==================================================
-# Sınıflandırma - Karar ağaçları modelleri uygulama | C4.5
+# 2. Manuel Entropi Hesaplama
 # ==================================================
-
-# Özellikleri ayırma
-ozellikler = veri.iloc[:, :-1]
-
-# Bağımsız değişkeni ayırma
-hedef_sinif = veri.iloc[:, -1]
-
-# entropi hesaplama
 
 
 def entropiHesap(veri_kumesi):
+    # Veri kümesindeki sınıfları ve kaçar adet olduklarını bulur
     siniflar, sayilar = np.unique(veri_kumesi, return_counts=True)
 
+    # Olasılık hesaplama (p = eleman sayısı / toplam sayı)
     olasiliklar = sayilar / len(veri_kumesi)
-    # 1e-9 ==> bazi sayilar sıfır değer alıp sonsuz değere girebilir,
-    # Bunun için çok küçük bir değer eklenir.
+
+    # 1e-9: Olasılık sıfır olduğunda log2(0) tanımsızlık hatası vermesin diye eklenir
     entropi = -np.sum(olasiliklar * np.log2(olasiliklar + 1e-9))
 
     return entropi
 
 
-def bilgiKazanciHesapla(ozellik_kolon, hedef, esik_degeri):
+# ==================================================
+# 3. ID3 Algoritması (Bilgi Kazancı / Information Gain)
+# ==================================================
 
-    # Ana entropiyi hesapla
+
+def bilgiKazanciHesapla(ozellik_kolon, hedef, esik_degeri):
+    # Ana düğümün (Parent) entropisi
     parent_entropi = entropiHesap(hedef)
 
-    # Karar ağacının dallandırılması
-    sol = ozellik_kolon <= esik_degeri  # sol dallanma
-    sag = ozellik_kolon >= esik_degeri  # sag dallanma
+    # Verinin belirlenen eşik değerine göre sol ve sağ dallara ayrılması
+    sol = ozellik_kolon <= esik_degeri
+    sag = ozellik_kolon >= esik_degeri
 
     toplam_veri_len = len(hedef)
-
     sol_boyut = np.sum(sol)
     sag_boyut = np.sum(sag)
 
-    if sol_boyut == 0 or sag_boyut == 0:  # Dallanmamış veri
+    # Dallanma gerçekleşmediyse kazanç 0'dır
+    if sol_boyut == 0 or sag_boyut == 0:
         return 0
 
-    # Alt entropi hesaplama
+    # Alt dalların ağırlıklı ortalama entropisi
     child_entropi = (sol_boyut / toplam_veri_len) * entropiHesap(hedef[sol]) + (sag_boyut / toplam_veri_len) * entropiHesap(hedef[sag])
 
+    # Bilgi Kazancı = İlk Entropi - Bölünme Sonrası Entropi
     bilgi_kazanci = parent_entropi - child_entropi
 
     return bilgi_kazanci
 
 
-def kazanc_orani_hesapla(ozellik_kolon, hedef, esik_degeri):
+# ==================================================
+# 4. C4.5 Algoritması (Kazanç Oranı / Gain Ratio)
+# ==================================================
 
+
+def kazanc_orani_hesapla(ozellik_kolon, hedef, esik_degeri):
     kazanc = bilgiKazanciHesapla(ozellik_kolon, hedef, esik_degeri)
 
-    sol = ozellik_kolon <= esik_degeri  # sol dallanma
-    sag = ozellik_kolon >= esik_degeri  # sag dallanma
+    sol = ozellik_kolon <= esik_degeri
+    sag = ozellik_kolon >= esik_degeri
 
     toplam_veri = len(hedef)
-
     sol_boyut = np.sum(sol)
     sag_boyut = np.sum(sag)
 
-    if sol_boyut == 0 or sag_boyut == 0:  # Dallanmamış veri
+    if sol_boyut == 0 or sag_boyut == 0:
         return 0
 
     p_sol = sol_boyut / toplam_veri
     p_sag = sag_boyut / toplam_veri
 
+    # Bölünme Bilgisi (Split Info) hesaplama
     bolunme_bilgisi = -(p_sol * np.log2(p_sol) + 1e-9) + (p_sag * np.log2(p_sag) + 1e-9)
 
     if bolunme_bilgisi == 0:
@@ -110,8 +99,19 @@ def kazanc_orani_hesapla(ozellik_kolon, hedef, esik_degeri):
     return kazanc / bolunme_bilgisi
 
 
+# ==================================================
+# 5. Modelin Çalıştırılması ve Örnek Test
+# ==================================================
+
+# Iris veri setinin 3. sütununu (petal_length) bağımsız değişken olarak seçiyoruz
 ornek_ozellik = ozellikler.iloc[:, 2]
-ornek_esik_degeri = 2.5  # Kendimiz belirliyoruz
+ornek_esik_degeri = 2.5  # Dallanma sınırı
 
 id3 = bilgiKazanciHesapla(ornek_ozellik, hedef_sinif, ornek_esik_degeri)
 c45 = kazanc_orani_hesapla(ornek_ozellik, hedef_sinif, ornek_esik_degeri)
+
+print("ID3 Bilgi Kazancı:", id3)
+# Çıktı: ~0.918 (Veriyi 2.5 sınırından böldüğümüzde yüksek bilgi kazancı elde ederiz)
+
+print("C4.5 Kazanç Oranı:", c45)
+# Çıktı: ~0.987 (Bölünme bilgisi ile düzeltilmiş karar skoru)

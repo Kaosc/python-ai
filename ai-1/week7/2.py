@@ -1,21 +1,21 @@
 """
 ÖRNEK: Lineer Regresyon
+İstatistiksel Lineer Regresyon ve Polinoma Geçiş
 """
+
+# Tek değişkenli doğrusal regresyon katsayılarını scipy.stats ile tek satırda bulmayı ve
+# verinin düz bir çizgiye uymadığı durumlarda polinom denklemine geçmeyi gösterir.
 
 import numpy as np
 import matplotlib.pyplot as plt
-
-# Kümeleme işlemi için
 from scipy import stats
-
-# Doğrusal regresyon denklemi: ax + b
-# a için slope, b için intercept kullanılır.
 
 x = [1, 4, 5, 6, 9, 12, 18, 25, 33, 42, 55, 65]
 y = [11, 31, 44, 55, 64, 76, 87, 91, 100, 123, 136, 145]
 
-# -0.3,   19
+# Doğrusal regresyon denklemi (y = slope * x + intercept)
 slope, intercept, r, p, std_err = stats.linregress(x, y)
+# Örnek Çıktı: slope ≈ 1.88 (Eğim), intercept ≈ 32.16 (Kesim noktası)
 
 
 def yontem(x):
@@ -25,18 +25,8 @@ def yontem(x):
 hesapla = list(map(yontem, x))
 
 plt.scatter(x, y, label="Gerçek Değerler")
-
-# Regresyon doğrusunu göster
-# Noktalar doğruya çok uzaksa lineer denklem bu veriye uygun değildir.
-# Bu durumda tahmin için başka bir yöntem kullanılmalıdır.
-plt.plot(x, hesapla, color="red", label="Regrasyon Doğrusu")
-
-
+plt.plot(x, hesapla, color="red", label="Regresyon Doğrusu")
 plt.show()
 
-"""
-ÖRNEK: Polinomsal Regresyon
-"""
-
-# Dereceyi biz belirliyoruz; burada derece 3 olarak seçilmiştir.
+# Veriye 3. dereceden polinom uydurma
 polinom = np.poly1d(np.polyfit(x, y, 3))

@@ -4,40 +4,38 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
-
-# Regresyon analizi için
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
-# Normalde iris veri seti gibi iki boyutlu bir veri seti gerekir.
 x = [1, 4, 5, 6, 9, 12, 18, 25, 33, 42, 55, 65]
 y = [11, 31, 44, 55, 64, 76, 87, 91, 100, 123, 136, 145]
 
-# include_bias, sabit terimin eklenip eklenmeyeceğini belirler.
+# x dizisini 2 boyutlu sütun vektörüne çevirme
+x_2d = np.array(x).reshape(-1, 1)
+
+# 1. Polinom özellik dönüştürücü (3. derece)
 poly = PolynomialFeatures(degree=3, include_bias=False)
+x_poly = poly.fit_transform(x_2d)
+# Çıktı (x_poly ilk 2 satır):
+# [[ 1.,  1.,   1.]   -> (x¹, x², x³)
+#  [ 4., 16.,  64.]]
 
-# Verileri modelin kullanabileceği biçime dönüştür
-x_poly = poly.fit_transform(x)
-
-# Modeli oluştur
+# 2. Modeli oluşturma ve eğitme
 model = LinearRegression()
-
-# Modeli, x'in dönüştürülmüş değerleriyle eğit
 model.fit(x_poly, y)
 
-# Tahmin yap
+# 3. Tahmin ve Hata Analizi
 y_tahmin = model.predict(x_poly)
 
-# Hataları hesapla
 r2 = r2_score(y, y_tahmin)
 mae = mean_absolute_error(y, y_tahmin)
 mse = mean_squared_error(y, y_tahmin)
-## RMSE hesaplama (MSE'nin karekökü)
-rmse = np.square(mse)
+rmse = np.sqrt(mse)  # MSE'nin karekökü
 
 print("r2 değer: ", r2)
+# Çıktı: 0.9963... (Eğrisel model veriye %99.6 uyum sağladı)
 
 plt.figure(figsize=(5, 6))
 plt.scatter(y, y_tahmin)
+plt.show()

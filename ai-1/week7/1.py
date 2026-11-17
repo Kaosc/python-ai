@@ -1,28 +1,27 @@
 """
-GRAFİK ÇİZME
+Grafik Çizme
+Hiyerarşik Kümeleme ve Dendrogram
 """
+
+# Elinde sınıf etiketleri (target) olmadığında, verilerin birbirine olan
+# geometrik uzaklıklarına göre kendiliğinden gruplanmasını sağlayan yöntemdir.
 
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
-
-# Kümeleme işlemi için
 from scipy.cluster.hierarchy import dendrogram, linkage
 
 iris = load_iris()
 
-x = iris.data[:, 0]  # İlk sütundaki tüm elemanlar
-y = iris.data[:, 1]
+x = iris.data[:, 0]  # 1. sütundaki tüm elemanlar (sepal_length)
+y = iris.data[:, 1]  # 2. sütundaki tüm elemanlar (sepal_width)
 
-# Grafik
+plt.scatter(x, y)  # İki özelliğin nokta dağılım grafiği
 
-plt.scatter(x, y)
-# plt.show()
-
-# Verilerin nerede yoğunlaştığını ve ortak merkez noktalarının nerede
-# bulunduğunu görmek için hiyerarşik kümeleme grafiği oluşturulur.
+# Hiyerarşik kümeleme matrisi oluşturma
 data = iris.data
 linkage_data = linkage(data, method="ward", metric="euclidean")
-# Grafiği çiz
+
+# Dendrogram (Ağaç şeması) çizimi
 plt.figure(figsize=(12, 6))
 dendrogram(linkage_data)
 

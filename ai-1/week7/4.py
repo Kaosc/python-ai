@@ -1,10 +1,8 @@
 """
 ÖRNEK: KNN SINIFLANDIRMASI
-KNN Sınıflandırması ve Karmaşıklık Matrisi
 """
 
-# K-En Yakın Komşu (KNN) algoritması, yeni gelen bir çiçeğin ölçümlerine bakıp
-# uzayda kendisine en yakın $K$ komşusunun çoğunluğu hangi türse o sınıfı atar
+# Elinde çiçek ölçüleri var ve yeni gelen bir çiçeğin hangi türe ait olduğunu tahmin etmek istiyorsun. KNN (K-En Yakın Komşu) algoritması haritada yeni çiçeğin yanına gider, en yakınındaki 5 komşusuna bakar; 4 tanesi Setosa ise "Bu da Setosa'dır" der.
 
 import pandas as pd
 import matplotlib.pyplot as plt

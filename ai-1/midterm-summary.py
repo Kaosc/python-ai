@@ -432,3 +432,75 @@ hata_goster = pd.DataFrame(hata_matrisi, cols, index)
 
 sea.heatmap(hata_goster, annot=True)
 plt.show()
+
+# ===================================================================
+# XOR Problemi
+# ===================================================================
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(1)
+
+# 1. 200 satır, 2 sütundan oluşan normal dağılımlı rastgele veri üretme
+X_xor = np.random.randn(200, 2)
+# Çıktı (ilk 2 satır):
+# [[ 1.62434536 -0.61175641]
+#  [-0.52817175 -1.07296862]]
+
+# 2. XOR koşulu: İki koşuldan YALNIZCA BİRİ doğruysa True döner
+y_xor = np.logical_xor(X_xor[:, 0] > 0, X_xor[:, 1] > 1)
+# Çıktı: [True, False, False, ...]
+
+# 3. True/False etiketlerini 1 ve 0 sayılarına çevirme
+y_xor = np.where(y_xor, 1, 0)
+# Çıktı: [1, 0, 0, ...]
+
+# 4. Sınıfları grafikte çizdirme
+plt.scatter(X_xor[y_xor == 1, 0], X_xor[y_xor == 1, 1], c="royalblue", marker="s", label="sınıf 1", edgecolor="black")
+plt.scatter(X_xor[y_xor == 0, 0], X_xor[y_xor == 0, 1], c="royalblue", marker="s", label="sınıf 2", edgecolor="black")
+plt.xlim([-3, 3])
+plt.ylim([-3, 3])
+plt.xlabel("Özellik 1")
+plt.ylabel("Özellik 2")
+plt.legend(loc="best")
+plt.show()
+
+# ===================================================================
+# SVM ve Karar Bölgeleri
+# ===================================================================
+
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn import datasets
+
+iris = datasets.load_iris()
+X = iris.data[:, [2, 3]]  # Sadece 2. ve 3. sütunlar (petal length ve petal width)
+y = iris.target
+
+# 1. Stratify ile dengeli %80 Eğitim / %20 Test ayrımı
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# 2. StandardScaler (Z-Skor Ölçekleme)
+sc = StandardScaler()
+sc.fit(x_train)                      # SADECE eğitim verisinin ortalama ve std'sini öğrenir
+x_train_std = sc.transform(x_train)  # Eğitim verisini ölçekler
+x_test_std = sc.transform(x_test)    # Test verisini aynı ölçekle dönüştürür
+
+# 3. Eğitim ve test verilerini tekrar tek parçada birleştirme (Grafik çizimi için)
+x_combined_std = np.vstack((x_train_std, x_test_std))  # Dikey (alt alta) birleştirme
+y_combined_Std = np.hstack((y_train, y_test))          # Yatay (yan yana) birleştirme
+
+# 4. Karar bölgelerini boyayan ızgara (meshgrid) mantığı
+def karar(X, y, classifier, test_idx=None, resolution=0.02):
+    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution),
+                           np.arange(x2_min, x2_max, resolution))
+    Z = classifier.predict(np.array([xx1.ravel(), xx2.ravel()]).T)
+    Z = Z.reshape(xx1.shape)
+
+# 5. SVM Modelini eğitme
+svm = SVC(kernel="linear", random_state=1)
+svm.fit(x_train_std, y_train)

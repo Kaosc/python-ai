@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 
-df = pd.read_csv("E:\\dev\\python-ai\\ai-1\\week5\\dolar.csv")
+df = pd.read_csv(Path(__file__).resolve().parent / "dolar.csv")
 
 # Örnek Ham Veri (dolar.xlsx içi):
 # Tarih         Şimdi     Açılış    Yüksek    Düşük

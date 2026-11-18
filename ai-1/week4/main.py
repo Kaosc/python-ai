@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 
 # ==================================================
 # 1. Veri Okuma ve iloc ile Dilimleme (Ön İşleme)
 # ==================================================
 
-veri = pd.read_csv("E:\\dev\\python-ai\\ai-1\\week4\\iris.csv")
+veri = pd.read_csv(Path(__file__).resolve().parent / "iris.csv")
 
 # iloc Kulanım Kuralları
 # veri.iloc[0,0]   --> 1. satır 1. sütun

@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
 import statistics as stat
+from pathlib import Path
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+PROJECT_DIR = Path(__file__).resolve().parent
 
 # ===================================================================
 # ===================================================================
@@ -187,7 +190,7 @@ sonuc_disi = n * tahmin_x + b
 # Entropi - ID3 - C4.5
 # ===================================================================
 
-veri = pd.read_csv("E:\\dev\\python-ai\\ai-1\\week4\\iris.csv")
+veri = pd.read_csv(PROJECT_DIR / "week4" / "iris.csv")
 
 ozellikler = veri.iloc[:, :-1]
 hedef_sinif = veri.iloc[:, -1]
@@ -268,7 +271,7 @@ c45 = kazanc_orani_hesapla(ornek_ozellik, hedef_sinif, ornek_esik_degeri)
 # Dolar verisi ile gelecek dolar fiyatlarını tahmin etme
 # ===================================================================
 
-df = pd.read_csv("E:\\dev\\python-ai\\ai-1\\week5\\dolar.csv")
+df = pd.read_csv(PROJECT_DIR / "week5" / "dolar.csv")
 
 for sutun in ("Şimdi", "Açılış", "Yüksek", "Düşük"):
     df[sutun] = df[sutun].astype(str).str.replace(".", "").str.replace(",", ".").astype(float)

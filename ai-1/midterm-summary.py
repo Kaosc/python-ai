@@ -144,7 +144,7 @@ import matplotlib.pyplot as plt
 veri = [1, 2, 3, 4, 15, 2, 4, 1]
 
 tepe_indeksleri, bilgiler = find_peaks(veri)
-# Çıktı: [4 6]
+# Çıktı: [4 6] --> indexler
 
 plt.plot(veri)
 plt.plot(tepe_indeksleri, np.array(veri)[tepe_indeksleri], "x")
@@ -313,8 +313,8 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 
 iris = load_iris()
 
-x = iris.data[:, 0] # 1. sütun (sepal_length)
-y = iris.data[:, 1] # 2. sütun (sepal_width)
+x = iris.data[:, 0]  # 1. sütun (sepal_length)
+y = iris.data[:, 1]  # 2. sütun (sepal_width)
 
 plt.scatter(x, y)
 
@@ -323,7 +323,7 @@ data = iris.data
 linkage_data = linkage(data, method="ward", metric="euclidean")
 
 # 2. Dendrogram (Ağaç Şeması) Çizimi
-plt.figure(figsize=(12,6))
+plt.figure(figsize=(12, 6))
 dendrogram(linkage_data)
 
 plt.title("Kümeleme Grafiği")
@@ -335,18 +335,17 @@ plt.show()
 # İstatistiksel Doğrusal Regresyon (linregress) ve Polinoma Geçiş
 # ===================================================================
 
-# 2. Veriye 3. dereceden polinom uydurma (y = ax³ + bx² + cx + d)
-polinom = np.poly1d(np.polyfit(x, y, 3))
-
 x = [1, 4, 5, 6, 9, 12, 18, 25, 33, 42, 55, 65]
 y = [11, 31, 44, 55, 64, 76, 87, 91, 100, 123, 136, 145]
 
 # 1. Tek satırda Doğrusal Regresyon (y = slope * x + intercept)
-slope, intercept, r, p, std_err = stat.linregress(x, y)
+slope, intercept, r, p, std_err = sa.linregress(x, y)
 # Çıktı: slope ≈ 1.88 (Eğim), intercept ≈ 32.16 (Kesim noktası)
+
 
 def yontem(x):
     return slope * x + intercept
+
 
 hesapla = list(map(yontem, x))
 
@@ -369,6 +368,7 @@ y = [11, 31, 44, 55, 64, 76, 87, 91, 100, 123, 136, 145]
 
 # x dizisini 2 boyutlu sütun vektörüne çevirme
 x_2d = np.array(x).reshape(-1, 1)
+print("x_2d: ", x_2d)
 
 # 1. Polinom özellik dönüştürücü (3. derece)
 poly = PolynomialFeatures(degree=3, include_bias=False)
@@ -384,7 +384,7 @@ y_tahmin = model.predict(x_poly)
 r2 = r2_score(y, y_tahmin)
 mae = mean_absolute_error(y, y_tahmin)
 mse = mean_squared_error(y, y_tahmin)
-rmse = np.sqrt(mse) # MSE'nin karekökü
+rmse = np.sqrt(mse)  # MSE'nin karekökü
 
 print("r2 değer: ", r2)
 # Çıktı: 0.9714465671580801... (Eğrisel model veriye %97.1 uyum sağladı)
@@ -406,8 +406,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
 iris = load_iris()
-x = iris.data     # Girdiler (150 çiçek, 4 özellik)
-y = iris.target   # Etiketler (0: setosa, 1: versicolor, 2: virginica)
+x = iris.data  # Girdiler (150 çiçek, 4 özellik)
+y = iris.target  # Etiketler (0: setosa, 1: versicolor, 2: virginica)
 
 # 1. Veriyi %80 Eğitim, %20 Test olarak rastgele karıştırıp bölme
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=17)
@@ -484,22 +484,23 @@ x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # 2. StandardScaler (Z-Skor Ölçekleme)
 sc = StandardScaler()
-sc.fit(x_train)                      # SADECE eğitim verisinin ortalama ve std'sini öğrenir
+sc.fit(x_train)  # SADECE eğitim verisinin ortalama ve std'sini öğrenir
 x_train_std = sc.transform(x_train)  # Eğitim verisini ölçekler
-x_test_std = sc.transform(x_test)    # Test verisini aynı ölçekle dönüştürür
+x_test_std = sc.transform(x_test)  # Test verisini aynı ölçekle dönüştürür
 
 # 3. Eğitim ve test verilerini tekrar tek parçada birleştirme (Grafik çizimi için)
 x_combined_std = np.vstack((x_train_std, x_test_std))  # Dikey (alt alta) birleştirme
-y_combined_Std = np.hstack((y_train, y_test))          # Yatay (yan yana) birleştirme
+y_combined_Std = np.hstack((y_train, y_test))  # Yatay (yan yana) birleştirme
+
 
 # 4. Karar bölgelerini boyayan ızgara (meshgrid) mantığı
 def karar(X, y, classifier, test_idx=None, resolution=0.02):
     x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution),
-                           np.arange(x2_min, x2_max, resolution))
+    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution), np.arange(x2_min, x2_max, resolution))
     Z = classifier.predict(np.array([xx1.ravel(), xx2.ravel()]).T)
     Z = Z.reshape(xx1.shape)
+
 
 # 5. SVM Modelini eğitme
 svm = SVC(kernel="linear", random_state=1)

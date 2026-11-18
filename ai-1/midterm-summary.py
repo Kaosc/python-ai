@@ -1,43 +1,42 @@
 import pandas as pd
 import numpy as np
-import statistics as stat
+import scipy.stats as stats
+import statistics as st
+import matplotlib.pyplot as plt
 from pathlib import Path
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
-# ===================================================================
-# ===================================================================
+a = [1, 2, 3, 4]
+st.mean(a) # Aritmetik ortalama = 2.5
 
-a = [1, 2, 3]
-print(stat.mean(a))
+sales = np.random.randint(10, 50, size=(4, 3)) # 10 ile 50 arasında 4 satır 3 sütunluk rastgele sayılar.
+dataFrame = pd.DataFrame(sales) # 4 satır 3 sütunluk bir veri çerçevesi
 
-sales = np.random.randint(10, 50, size=(4, 3))
-salesDataFrame = pd.DataFrame(sales)
-firstDayMean = stat.mean(sales[0])
+rdList = np.linspace(0, 10, 100) # 0 ile 10 arasında 100 tane sayı üretir ve bunları eşit aralıklarla dağıtır.
 
-rdList = np.linspace(0, 10, 100)
-
-# ===================================================================
+# ================================================================================
 # Normalizations - IQR, Z-SCOR, LOG, L2
-# ===================================================================
+# 500 verisi aykırı bir veri. Normalizasyon ile bunu değer normal aralığa çekeriz.
+# ================================================================================
 
-clicks = np.array(([5, 12, 15, 18, 22, 500]))
+veri = np.array(([5, 12, 15, 18, 22, 500]))
 
-q75, q25 = np.percentile(clicks, [75, 25])
+q75, q25 = np.percentile(veri, [75, 25])
 aykiri = q75 - q25
-medyan = np.median(clicks)
-x = (clicks - medyan) / aykiri
+medyan = np.median(veri)
+x = (veri - medyan) / aykiri
 # [-1.39393939 -0.54545455 -0.18181818  0.18181818  0.66666667 58.60606061]
 
-z = (clicks - np.mean(clicks)) / np.std(clicks)
+z_score = (veri - np.mean(veri)) / np.std(veri)
 # [-0.49894552 -0.46028185 -0.4437117  -0.42714155 -0.40504803  2.23512865]
 
-log = np.log1p(clicks)
+log = np.log1p(veri)
 # [1.79175947 2.56494936 2.77258872 2.94443898 3.13549422 6.2166061 ]
 
-l2 = np.linalg.norm(clicks, keepdims=True)
-normal = clicks / l2
+l2 = np.linalg.norm(veri, keepdims=True)
+normal = veri / l2
 # [0.00997605 0.02394251 0.02992814 0.03591377 0.0438946  0.99760463]
 
 # ===================================================================
@@ -90,13 +89,12 @@ denklem_cozumu = np.linalg.solve(a, b)
 # T Test
 # ===================================================================
 
-import scipy.stats as sa
 
 a = [10, 12, 11, 13, 12]
 b = [20, 21, 22, 23, 24]
 
 # İki Bağımsız Örneklem T-Testi
-sonuc = sa.ttest_ind(a, b)
+sonuc = stats.ttest_ind(a, b)
 
 print("t değeri:", sonuc.statistic)
 print("p değeri:", sonuc.pvalue)
@@ -142,7 +140,6 @@ sonuc, hata = quad(f, 0, 2)
 # ===================================================================
 
 from scipy.signal import find_peaks
-import matplotlib.pyplot as plt
 
 veri = [1, 2, 3, 4, 15, 2, 4, 1]
 
@@ -172,18 +169,16 @@ print("x=3 için:", f(3))  # Çıktı: 19.0 (17 ile 21'in tam ortasını doğrus
 # Aralık Dışı Tahmin - DoğrusalTahmin
 # ===================================================================
 
-import numpy as np
-
 x = [1, 2, 4]
 y = [10, 17, 21]
 
 # 1. derece doğru denklemi (y = n*x + b) katsayılarını bulma
-n, b = np.polyfit(x, y, 1)
+egim, kesim = np.polyfit(x, y, 1)
 # Çıktı: Eğim (n): 3.57, Kesim Noktası (b): 7.29
 
 # Veri setinin dışındaki x = 5 için gelecek tahmini
 tahmin_x = 5
-sonuc_disi = n * tahmin_x + b
+sonuc_disi = egim * tahmin_x + kesim
 # Çıktı: 25.14
 
 # ===================================================================
@@ -192,8 +187,10 @@ sonuc_disi = n * tahmin_x + b
 
 veri = pd.read_csv(PROJECT_DIR / "week4" / "iris.csv")
 
-ozellikler = veri.iloc[:, :-1]
-hedef_sinif = veri.iloc[:, -1]
+ozellikler = veri.iloc[:, :-1] # indexsi alır - iloc
+hedef_sinif = veri.iloc[:, -1] # indexsi alır - iloc
+
+x = veri.loc[:, "species"] # etkieti alır - loc
 
 
 def entropiHesap(veri_kumesi):
@@ -310,8 +307,6 @@ y_tahmin = a * x_test + b
 # Hiyerarşik Kümeleme ve Dendrogram (Gözetimsiz Öğrenme)
 # ===================================================================
 
-import matplotlib.pyplot as plt
-from sklearn.datasets import load_iris
 from scipy.cluster.hierarchy import dendrogram, linkage
 
 iris = load_iris()
@@ -342,7 +337,7 @@ x = [1, 4, 5, 6, 9, 12, 18, 25, 33, 42, 55, 65]
 y = [11, 31, 44, 55, 64, 76, 87, 91, 100, 123, 136, 145]
 
 # 1. Tek satırda Doğrusal Regresyon (y = slope * x + intercept)
-slope, intercept, r, p, std_err = sa.linregress(x, y)
+slope, intercept, r, p, std_err = stats.linregress(x, y)
 # Çıktı: slope ≈ 1.88 (Eğim), intercept ≈ 32.16 (Kesim noktası)
 
 
@@ -369,6 +364,11 @@ from sklearn.linear_model import LinearRegression
 x = [1, 4, 5, 6, 9, 12, 18, 25, 33, 42, 55, 65]
 y = [11, 31, 44, 55, 64, 76, 87, 91, 100, 123, 136, 145]
 
+# 1. train_test_split: Verinin %80'ini ders çalışmaya (train), %20'sini gizlice sınav sorusu (test) yapmaya ayırır.
+# 2. fit(x_train, y_train): Eğitim verilerine bakıp aradaki kuralı (y = ax + b) öğrenir.
+# 3. predict(x_test): Saklanan sınav sorusunu (x_test) öğrendiği kurala koyar ve y sonucunu tahmin eder.
+# (Dışarıdan yeni bir sayı sormak istersen: model.predict([[5]]) yazılır.)
+
 # x dizisini 2 boyutlu sütun vektörüne çevirme
 x_2d = np.array(x).reshape(-1, 1)
 print("x_2d: ", x_2d)
@@ -384,6 +384,7 @@ model.fit(x_poly, y)
 # 3. Tahmin ve Hata Analizi
 y_tahmin = model.predict(x_poly)
 
+## Hataları Bulma
 r2 = r2_score(y, y_tahmin)
 mae = mean_absolute_error(y, y_tahmin)
 mse = mean_squared_error(y, y_tahmin)
@@ -400,12 +401,9 @@ plt.show()
 # KNN Sınıflandırması
 # ===================================================================
 
-import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sea
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
 iris = load_iris()
@@ -439,9 +437,6 @@ plt.show()
 # ===================================================================
 # XOR Problemi
 # ===================================================================
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 np.random.seed(1)
 

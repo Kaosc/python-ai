@@ -5,9 +5,10 @@ from sklearn.model_selection import train_test_split
 x = [1, 2, 3]
 y = [10, 11, 12]
 
-# 1. X'i 2 boyutlu sütuna çevir ve %80-%20 böl
+# 1. X'i 2 boyutlu sütuna çevir ve
 x = np.array(x).reshape(-1, 1)
 
+# %80-%20 böl
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=12)
 
 # 2. Modeli kur ve eğit (fit)
@@ -18,7 +19,6 @@ model.fit(x_train, y_train)
 y_tahmin = model.predict(x_test)
 
 print(y_tahmin)
-print(model.predict([[3]]))
 
 # ===================================================================
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_excel("dolar.xlsx")
+df = pd.read_csv("E:\\dev\\python-ai\\ai-1\\week5\\dolar.csv")
 
 # Örnek Ham Veri (dolar.xlsx içi):
 # Tarih         Şimdi     Açılış    Yüksek    Düşük
